@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOKVERSE AI — The Futuristic AI-Powered 3D Digital Library</title>
+  <meta name="description" content="An AI-powered digital library where users discover books in 3D, explore deep multi-tier summaries, academic research dossiers, audiobooks, and conversational AI companions.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- External Libraries: Three.js and GSAP for Interactive 3D Book & Smooth Physics -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. LUXURY NAVIGATION HEADER
+       ========================================================================= -->
+  <header class="bv-navbar" id="main-nav">
+    <div class="bv-nav-container">
+      <div class="bv-brand" onclick="navigateTo('home')">
+        <div class="bv-logo-crest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            <path d="M9 7h6M9 11h4"/>
+          </svg>
+        </div>
+        <div class="bv-brand-text">
+          <span class="bv-brand-title">BOOKVERSE<span class="gold-gradient">AI</span></span>
+          <span class="bv-brand-tagline">Intelligent Digital Library</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="bv-nav-links">
+        <a href="#home" class="nav-item active" data-target="home">Home</a>
+        <a href="#explore" class="nav-item" data-target="explore">Explore</a>
+        <a href="#categories" class="nav-item" data-target="categories">Categories</a>
+        <a href="#research" class="nav-item" data-target="research">AI Research</a>
+        <a href="#library" class="nav-item" data-target="library">
+          My Library <span class="badge" id="nav-library-count">0</span>
+        </a>
+        <a href="#compare" class="nav-item" data-target="compare">Compare</a>
+        <a href="#assistant" class="nav-item" data-target="assistant">AI Assistant</a>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="bv-nav-actions">
+        <div class="live-status-pill" id="system-status-indicator" title="AI Core Engine Connected">
+          <span class="pulsing-dot"></span>
+          <span class="status-label">AI Swarm Online</span>
+        </div>
+
+        <button class="btn btn-secondary btn-icon" id="quick-compare-btn" title="View Comparison Queue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="18" rx="1"/>
+            <rect x="14" y="3" width="7" height="18" rx="1"/>
+          </svg>
+          <span class="compare-badge" id="compare-queue-count">0</span>
+        </button>
+
+        <button class="btn btn-gold btn-sm" onclick="openSettingsModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Settings</span>
+        </button>
+
+        <button class="mobile-toggle-btn" id="mobile-menu-trigger" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       2. MAIN APPLICATION CONTAINER
+       ========================================================================= -->
+  <main class="bv-main">
+
+    <!-- =======================================================================
+         PAGE SECTION: HOME & CINEMATIC HERO
+         ======================================================================= -->
+    <section id="section-home" class="page-section active">
+      
+      <!-- HERO BANNER -->
+      <div class="bv-hero">
+        <div class="hero-bg-lights">
+          <div class="light-orb orb-gold"></div>
+          <div class="light-orb orb-blue"></div>
+        </div>
+
+        <div class="bv-container hero-grid">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <span class="gold-sparkle">✦</span> Next-Gen Knowledge Discovery
+            </div>
+            <h1 class="hero-title">
+              Where Literature Meets <br>
+              <span class="gold-gradient">Artificial Intelligence</span>
+            </h1>
+            <p class="hero-subtitle">
+              Step into a futuristic digital library. Discover books, witness them open in interactive 3D, and explore profound multi-tier summaries, academic research dossiers, and AI-powered audio narration.
+            </p>
+
+            <!-- INTELLIGENT SEARCH BAR -->
+            <div class="search-box-wrapper">
+              <div class="search-mode-selector">
+                <button class="search-mode-tab active" data-mode="all">All</button>
+                <button class="search-mode-tab" data-mode="title">Title</button>
+                <button class="search-mode-tab" data-mode="author">Author</button>
+                <button class="search-mode-tab" data-mode="subject">Topic</button>
+                <button class="search-mode-tab" data-mode="isbn">ISBN</button>
+              </div>
+
+              <form class="hero-search-form" id="hero-search-form" onsubmit="handleSearchSubmit(event)">
+                <div class="search-input-group">
+                  <div class="search-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <circle cx="11" cy="11" r="8"/>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                  </div>
+                  <input 
+                    type="text" 
+                    id="hero-search-input" 
+                    class="search-input" 
+                    placeholder="Search any title, author, concept, or question (e.g. 'Dune', 'Deep Work', 'Quantum Physics')..." 
+                    autocomplete="off"
+                  >
+                  <button type="submit" class="btn btn-gold btn-search" id="search-submit-btn">
+                    <span>Explore</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </button>
+                </div>
+              </form>
+
+              <!-- Search Suggestions Chips -->
+              <div class="search-suggestions">
+                <span class="suggest-label">Trending Inquiries:</span>
+                <button class="chip" onclick="quickSearch('Dune')">Dune</button>
+                <button class="chip" onclick="quickSearch('Deep Work')">Deep Work</button>
+                <button class="chip" onclick="quickSearch('Sapiens')">Sapiens</button>
+                <button class="chip" onclick="quickSearch('Thinking Fast and Slow')">Thinking, Fast & Slow</button>
+                <button class="chip" onclick="quickSearch('Marcus Aurelius Meditations')">Meditations</button>
+                <button class="chip" onclick="quickSearch('Superintelligence')">Superintelligence</button>
+              </div>
+            </div>
+
+            <!-- Hero Stats -->
+            <div class="hero-metrics">
+              <div class="metric-item">
+                <span class="metric-number">40M+</span>
+                <span class="metric-label">Books & Editions</span>
+              </div>
+              <div class="metric-divider"></div>
+              <div class="metric-item">
+                <span class="metric-number">100%</span>
+                <span class="metric-label">Verified Citations</span>
+              </div>
+              <div class="metric-divider"></div>
+              <div class="metric-item">
+                <span class="metric-number">3D / WebGL</span>
+                <span class="metric-label">Interactive Engine</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIGNATURE 3D FEATURED BOOK VIEWER -->
+          <div class="hero-3d-stage">
+            <div class="stage-frame">
+              <div class="stage-header">
+                <div class="stage-pill">
+                  <span class="glow-dot"></span>
+                  <span id="stage-book-status">Interactive 3D Hardcover</span>
+                </div>
+                <div class="stage-controls">
+                  <button class="stage-btn" id="toggle-3d-mode-btn" title="Toggle 3D / 2D Fallback">
+                    <span id="mode-label">3D Engine</span>
+                  </button>
+                  <button class="stage-btn" id="open-book-btn" title="Open Book Cover">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                    </svg>
+                    <span>Open Book</span>
+                  </button>
+                  <button class="stage-btn" id="reset-3d-cam-btn" title="Reset Camera">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                      <path d="M3 3v5h5"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- WebGL Canvas Container -->
+              <div class="canvas-viewport" id="book-canvas-container">
+                <div class="canvas-hint">Drag to rotate • Scroll to zoom • Click cover to open</div>
+                <!-- 2D Fallback Book Container (for low-spec or reduced motion) -->
+                <div class="fallback-2d-book" id="fallback-2d-container" style="display: none;">
+                  <div class="book-cover-card" id="fallback-card">
+                    <img id="fallback-cover-img" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80" alt="Book Cover">
+                    <div class="fallback-glow"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Featured Book Info Bar -->
+              <div class="stage-footer" id="featured-book-bar">
+                <div class="featured-info">
+                  <h3 class="featured-title" id="featured-title">Dune</h3>
+                  <p class="featured-author" id="featured-author">Frank Herbert • Sci-Fi Canon</p>
+                </div>
+                <button class="btn btn-gold btn-sm" id="featured-explore-btn" onclick="openActiveBookStudio()">
+                  <span>Explore In-Depth</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRENDING CANON SECTION -->
+      <div class="bv-container section-space">
+        <div class="section-heading">
+          <div>
+            <span class="gold-badge">Curated Masterworks</span>
+            <h2 class="section-title">Trending in <span class="gold-gradient">BookVerse AI</span></h2>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="navigateTo('explore')">View Full Catalog →</button>
+        </div>
+
+        <div class="books-grid" id="trending-books-grid">
+          <!-- Dynamically populated by app.js -->
+        </div>
+      </div>
+
+      <!-- EXPLORE BY CATEGORIES -->
+      <div class="bv-container section-space">
+        <div class="section-heading text-center">
+          <span class="gold-badge">Taxonomy & Domains</span>
+          <h2 class="section-title">Explore by Knowledge Domain</h2>
+          <p class="section-desc">Navigate through curated disciplines powered by deep semantic categorization.</p>
+        </div>
+
+        <div class="category-cards-grid">
+          <div class="category-card" onclick="quickCategorySearch('Science Fiction')">
+            <div class="cat-icon">🚀</div>
+            <h3>Sci-Fi & Speculative</h3>
+            <p>Space epics, cybernetics, and future civilizations.</p>
+            <span class="cat-link">Explore Realm →</span>
+          </div>
+          <div class="category-card" onclick="quickCategorySearch('Philosophy')">
+            <div class="cat-icon">🏛️</div>
+            <h3>Stoicism & Philosophy</h3>
+            <p>Ancient wisdom, ethics, logic, and existential inquiry.</p>
+            <span class="cat-link">Explore Realm →</span>
+          </div>
+          <div class="category-card" onclick="quickCategorySearch('Artificial Intelligence')">
+            <div class="cat-icon">🧠</div>
+            <h3>AI & Technology</h3>
+            <p>Neural networks, superintelligence, and computational futures.</p>
+            <span class="cat-link">Explore Realm →</span>
+          </div>
+          <div class="category-card" onclick="quickCategorySearch('Psychology')">
+            <div class="cat-icon">👁️</div>
+            <h3>Psychology & Cognitive</h3>
+            <p>Behavioral economics, mental models, and neuroscience.</p>
+            <span class="cat-link">Explore Realm →</span>
+          </div>
+          <div class="category-card" onclick="quickCategorySearch('History')">
+            <div class="cat-icon">📜</div>
+            <h3>Anthropology & History</h3>
+            <p>The rise of empires, revolutions, and human lineages.</p>
+            <span class="cat-link">Explore Realm →</span>
+          </div>
+          <div class="category-card" onclick="quickCategorySearch('Productivity')">
+            <div class="cat-icon">⚡</div>
+            <h3>High-Leverage Work</h3>
+            <p>Deep work systems, cognitive mastery, and focus.</p>
+            <span class="cat-link">Explore Realm →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI RESEARCH HIGHLIGHTS -->
+      <div class="bv-container section-space">
+        <div class="ai-highlight-banner">
+          <div class="banner-content">
+            <span class="gold-badge">Epistemic Rigor</span>
+            <h2>Zero Hallucination Deep Research Pipeline</h2>
+            <p>Unlike standard LLM interfaces, BookVerse AI decomposes claims into <strong>Verified Facts</strong>, <strong>Author Arguments</strong>, and <strong>Academic Debates</strong> backed by authentic bibliographic citations.</p>
+            <div class="banner-points">
+              <div class="b-point">
+                <span class="check-icon">✓</span> Real-time ISBN & Edition Resolution
+              </div>
+              <div class="b-point">
+                <span class="check-icon">✓</span> Multi-Tier 1m / 5m / 15m Literary Syntheses
+              </div>
+              <div class="b-point">
+                <span class="check-icon">✓</span> Model Agnostic: Gemini 2.5 & OpenAI GPT-4o
+              </div>
+            </div>
+            <button class="btn btn-gold" onclick="navigateTo('research')">Enter Research Suite →</button>
+          </div>
+          <div class="banner-visual">
+            <div class="dossier-preview-card">
+              <div class="dossier-badge">CONFIDENTIAL DOSSIER</div>
+              <h4>"Deep Work" Epistemic Audit</h4>
+              <div class="d-metric-bar">
+                <span>Empirical Rigor</span>
+                <div class="bar-fill" style="width: 88%;"></div>
+              </div>
+              <div class="d-metric-bar">
+                <span>Academic Citations</span>
+                <div class="bar-fill" style="width: 94%;"></div>
+              </div>
+              <div class="d-sample-citation">
+                "Verified: Cognitive switching penalty quantified at 23m 15s in Gloria Mark UC Irvine study."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =======================================================================
+         PAGE SECTION: EXPLORE & SEARCH RESULTS
+         ======================================================================= -->
+    <section id="section-explore" class="page-section">
+      <div class="bv-container">
+        <div class="section-heading">
+          <div>
+            <span class="gold-badge">Catalog Discovery</span>
+            <h2 class="section-title">Explore Global Digital Archive</h2>
+            <p class="section-desc">Search through millions of titles via Google Books and Open Library indexers.</p>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="catalog-toolbar">
+          <div class="search-input-group flex-1">
+            <input 
+              type="text" 
+              id="catalog-search-input" 
+              class="search-input" 
+              placeholder="Search by title, author, keyword, or ISBN..."
+            >
+            <button class="btn btn-gold" onclick="triggerCatalogSearch()">Search Catalog</button>
+          </div>
+        </div>
+
+        <!-- Search Status / Loading Indicator -->
+        <div class="search-status-bar" id="search-status-bar" style="display: none;">
+          <div class="loader-spinner"></div>
+          <span id="search-status-text">Querying global archives...</span>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="books-grid" id="catalog-results-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div class="empty-state" id="catalog-empty-state" style="display: none;">
+          <div class="empty-icon">📖</div>
+          <h3>No Volumes Found</h3>
+          <p>Try searching with broader terms or check the spelling of author and title.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         PAGE SECTION: AI DEEP RESEARCH SUITE
+         ======================================================================= -->
+    <section id="section-research" class="page-section">
+      <div class="bv-container">
+        <div class="section-heading">
+          <div>
+            <span class="gold-badge">10-Stage Pipeline</span>
+            <h2 class="section-title">AI Deep Research Engine</h2>
+            <p class="section-desc">Generate publication-grade academic dossiers, verify claims, and uncover conflicting interpretations.</p>
+          </div>
+        </div>
+
+        <div class="research-workspace">
+          <!-- Research Input Card -->
+          <div class="research-input-card">
+            <h3>Initiate Research Protocol</h3>
+            <p>Select a book from your library or enter any volume manually to trigger deep academic synthesis.</p>
+            
+            <div class="form-group">
+              <label>Book Title</label>
+              <input type="text" id="research-book-title" class="form-input" placeholder="e.g. Sapiens: A Brief History of Humankind">
+            </div>
+            
+            <div class="form-group">
+              <label>Author (Optional)</label>
+              <input type="text" id="research-book-author" class="form-input" placeholder="e.g. Yuval Noah Harari">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>AI Provider</label>
+                <select id="research-provider-select" class="form-select">
+                  <option value="gemini">Google Gemini 2.5 Flash</option>
+                  <option value="openai">OpenAI GPT-4o</option>
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label>Academic Rigor Level</label>
+                <select id="research-rigor-select" class="form-select">
+                  <option value="peer-reviewed">Peer-Reviewed / Doctoral</option>
+                  <option value="comprehensive">Comprehensive Analytical</option>
+                  <option value="executive">Executive Summary</option>
+                </select>
+              </div>
+            </div>
+
+            <button class="btn btn-gold btn-block" id="start-research-btn" onclick="executeDeepResearch()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Generate Research Dossier</span>
+            </button>
+          </div>
+
+          <!-- Research Output Display -->
+          <div class="research-output-area" id="research-output-container">
+            <div class="research-placeholder" id="research-placeholder">
+              <div class="blueprint-icon">🔬</div>
+              <h4>No Active Dossier</h4>
+              <p>Execute research to examine verified facts, author thesis, academic critiques, and source citations.</p>
+            </div>
+
+            <div class="dossier-sheet" id="dossier-sheet" style="display: none;">
+              <!-- Dynamically populated dossier content -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         PAGE SECTION: MY LIBRARY
+         ======================================================================= -->
+    <section id="section-library" class="page-section">
+      <div class="bv-container">
+        <div class="section-heading">
+          <div>
+            <span class="gold-badge">Personal Codex</span>
+            <h2 class="section-title">My Personal Library</h2>
+            <p class="section-desc">Manage saved books, bookmarks, reading progress, and generated dossiers.</p>
+          </div>
+        </div>
+
+        <div class="library-tabs">
+          <button class="lib-tab active" data-lib="saved">Saved Books (<span id="lib-count-saved">0</span>)</button>
+          <button class="lib-tab" data-lib="reading">Currently Reading (<span id="lib-count-reading">0</span>)</button>
+          <button class="lib-tab" data-lib="completed">Completed (<span id="lib-count-completed">0</span>)</button>
+          <button class="lib-tab" data-lib="dossiers">Saved Research Dossiers</button>
+        </div>
+
+        <div class="books-grid" id="library-books-grid">
+          <!-- Populated by JavaScript from local-first / Supabase store -->
+        </div>
+
+        <div class="empty-state" id="library-empty-state">
+          <div class="empty-icon">📚</div>
+          <h3>Your Library is Waiting</h3>
+          <p>Explore books and click "Add to Library" to build your intelligent personal archive.</p>
+          <button class="btn btn-gold" onclick="navigateTo('explore')">Explore Catalog</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         PAGE SECTION: BOOK COMPARISON
+         ======================================================================= -->
+    <section id="section-compare" class="page-section">
+      <div class="bv-container">
+        <div class="section-heading">
+          <div>
+            <span class="gold-badge">Comparative Epistemology</span>
+            <h2 class="section-title">Multi-Book Comparison Matrix</h2>
+            <p class="section-desc">Contrast foundational theses, methodologies, empirical validity, and practical takeaways.</p>
+          </div>
+        </div>
+
+        <!-- Comparison Selection Shelf -->
+        <div class="compare-shelf">
+          <div class="compare-slot" id="compare-slot-1">
+            <span class="slot-label">Book 1</span>
+            <div class="slot-content" id="slot-1-content">
+              <p class="slot-empty-text">Select Book 1 from library or catalog</p>
+            </div>
+          </div>
+
+          <div class="compare-vs-badge">VS</div>
+
+          <div class="compare-slot" id="compare-slot-2">
+            <span class="slot-label">Book 2</span>
+            <div class="slot-content" id="slot-2-content">
+              <p class="slot-empty-text">Select Book 2 from library or catalog</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="compare-actions-bar text-center">
+          <button class="btn btn-gold" id="run-comparison-btn" onclick="executeComparison()">
+            <span>Generate Comparative Analysis</span>
+          </button>
+          <button class="btn btn-outline" onclick="clearComparison()">Clear Slots</button>
+        </div>
+
+        <!-- Comparison Results Output -->
+        <div class="compare-results" id="compare-results-container" style="display: none;">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         PAGE SECTION: CONTEXTUAL AI ASSISTANT
+         ======================================================================= -->
+    <section id="section-assistant" class="page-section">
+      <div class="bv-container">
+        <div class="assistant-layout">
+          <!-- Left: Active Book Context Card -->
+          <div class="assistant-context-panel">
+            <div class="context-card">
+              <span class="gold-badge">Active Book Context</span>
+              <div class="context-book-details">
+                <img id="assistant-book-cover" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80" alt="Active Book">
+                <div>
+                  <h4 id="assistant-book-title">Dune</h4>
+                  <p id="assistant-book-author">Frank Herbert</p>
+                  <span class="badge" id="assistant-book-isbn">ISBN: 9780441172719</span>
+                </div>
+              </div>
+              <p class="context-desc" id="assistant-book-desc">
+                The conversational companion is grounded directly in this book's text, themes, arguments, and critical reception.
+              </p>
+              
+              <div class="provider-switch-box">
+                <label>Model Architecture:</label>
+                <select id="chat-model-select" class="form-select">
+                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast & Analytical)</option>
+                  <option value="gpt-4o">OpenAI GPT-4o (Deep Reasoning)</option>
+                  <option value="bookverse-native">BookVerse Native Offline Engine</option>
+                </select>
+              </div>
+
+              <!-- Suggested Prompts -->
+              <div class="prompt-chips">
+                <span class="chips-title">Suggested Inquiries:</span>
+                <button class="chip" onclick="sendSuggestedChat('What is the author\'s central thesis and fundamental premise?')">What is the central thesis?</button>
+                <button class="chip" onclick="sendSuggestedChat('Critically examine the author\'s primary assumptions.')">Critique the assumptions</button>
+                <button class="chip" onclick="sendSuggestedChat('Give me 3 practical ways I can apply these insights immediately.')">How can I apply this?</button>
+                <button class="chip" onclick="sendSuggestedChat('How does this book compare with modern scientific consensus?')">Scientific accuracy</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Chat Stream Interface -->
+          <div class="assistant-chat-panel">
+            <div class="chat-header">
+              <div class="chat-agent-info">
+                <div class="agent-avatar">BV</div>
+                <div>
+                  <h4>BookVerse Conversational Companion</h4>
+                  <span class="agent-status">Contextually Grounded • Verified Literature</span>
+                </div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="clearChatHistory()" title="Clear Chat">Clear</button>
+            </div>
+
+            <div class="chat-messages-container" id="chat-messages-stream">
+              <div class="chat-message msg-assistant">
+                <div class="msg-bubble">
+                  Greetings. I am your BookVerse AI Companion. I am currently calibrated to explore <strong>"Dune"</strong> by Frank Herbert. What would you like to investigate—the philosophical underpinnings of the Bene Gesserit, the ecology of Arrakis, or the author's critique of charismatic leadership?
+                </div>
+                <span class="msg-time">Just now</span>
+              </div>
+            </div>
+
+            <form class="chat-input-bar" id="chat-form" onsubmit="handleChatSubmit(event)">
+              <input 
+                type="text" 
+                id="chat-user-input" 
+                class="chat-input" 
+                placeholder="Ask anything about the active book, concepts, or applications..." 
+                autocomplete="off"
+              >
+              <button type="submit" class="btn btn-gold btn-icon-send" id="chat-send-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       3. INTERACTIVE 3D BOOK STUDIO MODAL (THE HEART OF BOOK EXPLORATION)
+       ========================================================================= -->
+  <div class="bv-modal" id="book-studio-modal">
+    <div class="modal-backdrop" onclick="closeBookStudioModal()"></div>
+    <div class="studio-dialog">
+      
+      <!-- Studio Header -->
+      <div class="studio-header">
+        <div class="studio-book-meta">
+          <span class="gold-badge" id="studio-category">Sci-Fi / Space Opera</span>
+          <h2 id="studio-title">Dune</h2>
+          <p id="studio-author">Frank Herbert • Published 1965</p>
+        </div>
+        <div class="studio-header-actions">
+          <button class="btn btn-outline btn-sm" id="studio-save-lib-btn" onclick="toggleSaveCurrentBook()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span id="studio-save-label">Add to Library</span>
+          </button>
+          <button class="btn btn-outline btn-sm" id="studio-add-compare-btn" onclick="addCurrentBookToCompare()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="18" rx="1"/>
+              <rect x="14" y="3" width="7" height="18" rx="1"/>
+            </svg>
+            <span>Compare</span>
+          </button>
+          <button class="btn-close" onclick="closeBookStudioModal()">×</button>
+        </div>
+      </div>
+
+      <!-- Studio Navigation Tabs -->
+      <div class="studio-tabs">
+        <button class="studio-tab active" data-tab="overview">Overview & Synopsis</button>
+        <button class="studio-tab" data-tab="summaries">Multi-Tier Summaries</button>
+        <button class="studio-tab" data-tab="research">Deep Research Dossier</button>
+        <button class="studio-tab" data-tab="audiobook">Audiobook & Narration</button>
+        <button class="studio-tab" data-tab="chat">Ask AI Companion</button>
+      </div>
+
+      <!-- Studio Tab Contents -->
+      <div class="studio-body">
+
+        <!-- TAB: OVERVIEW -->
+        <div class="studio-content-panel active" id="tab-overview">
+          <div class="overview-grid">
+            <div class="overview-cover-col">
+              <img id="studio-cover-img" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80" alt="Cover">
+              <div class="meta-pills-list">
+                <div class="meta-pill"><strong>ISBN:</strong> <span id="studio-isbn">9780441172719</span></div>
+                <div class="meta-pill"><strong>Pages:</strong> <span id="studio-pages">688</span></div>
+                <div class="meta-pill"><strong>Publisher:</strong> <span id="studio-publisher">Chilton Books</span></div>
+                <div class="meta-pill"><strong>Language:</strong> <span id="studio-language">EN</span></div>
+              </div>
+            </div>
+            <div class="overview-details-col">
+              <h3>Author Synopsis</h3>
+              <p class="overview-synopsis" id="studio-synopsis">
+                Loading volume synopsis...
+              </p>
+
+              <div class="thematic-tags-box">
+                <h4>Core Thematic Tags</h4>
+                <div class="tags-row" id="studio-thematic-tags">
+                  <span class="tag">Power & Leadership</span>
+                  <span class="tag">Ecological Balance</span>
+                  <span class="tag">Cognitive Conditioning</span>
+                  <span class="tag">Religious Mythmaking</span>
+                </div>
+              </div>
+
+              <div class="quick-action-strip">
+                <button class="btn btn-gold" onclick="switchStudioTab('summaries')">
+                  <span>Read 5-Minute Summary</span>
+                </button>
+                <button class="btn btn-secondary" onclick="switchStudioTab('audiobook')">
+                  <span>Listen to AI Narration</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: MULTI-TIER SUMMARIES -->
+        <div class="studio-content-panel" id="tab-summaries">
+          <div class="summary-tier-selector">
+            <button class="tier-tab active" data-tier="1min">1-Minute Core</button>
+            <button class="tier-tab" data-tier="5min">5-Minute Frameworks</button>
+            <button class="tier-tab" data-tier="15min">15-Minute Comprehensive</button>
+            <button class="tier-tab" data-tier="chapters">Chapter Breakdown</button>
+          </div>
+
+          <div class="summary-display-box" id="summary-display-box">
+            <!-- Dynamic summary tier injection -->
+          </div>
+        </div>
+
+        <!-- TAB: RESEARCH DOSSIER -->
+        <div class="studio-content-panel" id="tab-research">
+          <div class="dossier-wrapper" id="studio-dossier-box">
+            <!-- Dynamic research dossier injection -->
+          </div>
+        </div>
+
+        <!-- TAB: AUDIOBOOK & NARRATION -->
+        <div class="studio-content-panel" id="tab-audiobook">
+          <div class="audiobook-player-card">
+            <div class="audio-track-info">
+              <div class="ai-audio-badge">
+                <span class="pulse-dot-gold"></span>
+                <span>AI-Generated Narration & Companion Player</span>
+              </div>
+              <h3 id="audio-book-title">Dune: Essential Synthesis</h3>
+              <p id="audio-book-chapter">Chapter 1: The Gom Jabbar & Arrakis Primer</p>
+            </div>
+
+            <!-- Waveform / Progress Display -->
+            <div class="audio-progress-bar-wrap">
+              <span class="time-label" id="audio-current-time">0:00</span>
+              <input type="range" id="audio-seek-slider" min="0" max="100" value="0" class="audio-slider">
+              <span class="time-label" id="audio-duration">14:30</span>
+            </div>
+
+            <!-- Player Controls -->
+            <div class="audio-controls-row">
+              <button class="audio-btn" id="audio-skip-back-btn" title="Rewind 15s">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 4v6h6"></path>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                </svg>
+              </button>
+
+              <button class="audio-play-master" id="audio-master-play-btn" onclick="toggleAudioPlayback()">
+                <svg id="audio-play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+              </button>
+
+              <button class="audio-btn" id="audio-skip-fwd-btn" title="Forward 15s">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 4v6h-6"></path>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+              </button>
+
+              <div class="audio-setting-pill">
+                <span>Speed:</span>
+                <select id="audio-speed-select" class="speed-select" onchange="changeAudioSpeed(this.value)">
+                  <option value="0.75">0.75x</option>
+                  <option value="1.0" selected>1.0x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="2.0">2.0x</option>
+                </select>
+              </div>
+
+              <div class="audio-setting-pill">
+                <span>Sleep:</span>
+                <select id="audio-sleep-select" class="speed-select" onchange="setSleepTimer(this.value)">
+                  <option value="off">Off</option>
+                  <option value="15">15m</option>
+                  <option value="30">30m</option>
+                  <option value="45">45m</option>
+                  <option value="end">End</option>
+                </select>
+              </div>
+            </div>
+
+            <p class="audio-legal-notice">
+              <small>Notice: This audio is generated via BookVerse Neural Speech Synthesis for original summaries. For full unabridged audiobooks, please refer to authorized publishers and public domain sources.</small>
+            </p>
+          </div>
+        </div>
+
+        <!-- TAB: CHAT COMPANION -->
+        <div class="studio-content-panel" id="tab-chat">
+          <div class="studio-inline-chat">
+            <div class="chat-messages-container" id="studio-chat-stream">
+              <!-- Dynamically populated inline chat -->
+            </div>
+            <form class="chat-input-bar" onsubmit="handleStudioChatSubmit(event)">
+              <input type="text" id="studio-chat-input" class="chat-input" placeholder="Ask questions specifically about this book...">
+              <button type="submit" class="btn btn-gold btn-icon-send">Send</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. SYSTEM SETTINGS MODAL
+       ========================================================================= -->
+  <div class="bv-modal" id="settings-modal">
+    <div class="modal-backdrop" onclick="closeSettingsModal()"></div>
+    <div class="settings-dialog">
+      <div class="settings-header">
+        <h3>BookVerse AI — Configuration & API Telemetry</h3>
+        <button class="btn-close" onclick="closeSettingsModal()">×</button>
+      </div>
+      <div class="settings-body">
+        <p class="text-muted">
+          BookVerse AI features a server-side API proxy. Enter your personal keys to override default environment variables, or save them locally in your browser.
+        </p>
+
+        <div class="form-group">
+          <label>Google Gemini API Key (Google AI Studio)</label>
+          <input type="password" id="user-gemini-key" class="form-input" placeholder="AIzaSy...">
+          <small class="form-hint">Used for Deep Research, Multi-tier Syntheses, and Conversational Reasoning.</small>
+        </div>
+
+        <div class="form-group">
+          <label>OpenAI API Key (Optional Model Switcher)</label>
+          <input type="password" id="user-openai-key" class="form-input" placeholder="sk-proj-...">
+        </div>
+
+        <div class="form-group">
+          <label>3D Graphics Performance Mode</label>
+          <select id="user-graphics-mode" class="form-select">
+            <option value="high">High Fidelity 3D (Three.js WebGL & Shadows)</option>
+            <option value="balanced">Balanced 3D (Optimized Mobile Shaders)</option>
+            <option value="2d">2D High-Performance Fallback (Lowest Battery Consumption)</option>
+          </select>
+        </div>
+
+        <div class="server-status-telemetry" id="server-telemetry-box">
+          <h4>Live Server Connectivity:</h4>
+          <pre id="telemetry-log">Querying /api/health...</pre>
+        </div>
+      </div>
+      <div class="settings-footer">
+        <button class="btn btn-outline" onclick="closeSettingsModal()">Cancel</button>
+        <button class="btn btn-gold" onclick="saveUserSettings()">Save & Calibrate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       5. FOOTER
+       ========================================================================= -->
+  <footer class="bv-footer">
+    <div class="bv-container footer-grid">
+      <div class="footer-brand">
+        <div class="bv-brand">
+          <div class="bv-logo-crest">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </div>
+          <span class="bv-brand-title">BOOKVERSE<span class="gold-gradient">AI</span></span>
+        </div>
+        <p class="footer-tagline">
+          The next-generation intelligent reading and epistemic research engine. Powered by Google Antigravity, Gemini 2.5, Three.js, and Open Knowledge Archives.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#home" onclick="navigateTo('home')">Home & 3D Stage</a></li>
+          <li><a href="#explore" onclick="navigateTo('explore')">Global Catalog</a></li>
+          <li><a href="#research" onclick="navigateTo('research')">AI Deep Research</a></li>
+          <li><a href="#library" onclick="navigateTo('library')">My Personal Library</a></li>
+          <li><a href="#compare" onclick="navigateTo('compare')">Book Comparison</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Technology</h4>
+        <ul>
+          <li><span>Google Antigravity Engine</span></li>
+          <li><span>Google Gemini & OpenAI Integration</span></li>
+          <li><span>Three.js WebGL & GSAP Physics</span></li>
+          <li><span>Google Books & Open Library</span></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Epistemic Standards</h4>
+        <p class="footer-legal">
+          BookVerse AI prioritizes copyright integrity and academic rigor. Summaries and research dossiers are original analytical syntheses. Unabridged works remain the sole property of their respective authors and publishers.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="bv-container footer-bottom-inner">
+        <span>© 2026 BOOKVERSE AI Platform. Production-Grade Autonomous Engineering.</span>
+        <div class="footer-status-pill">
+          <span class="pulsing-dot"></span>
+          <span>Engine Status: Operational</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core JavaScript Modules -->
+  <script src="three-book.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

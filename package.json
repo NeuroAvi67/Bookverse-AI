@@ -1,0 +1,27 @@
+{
+  "name": "bookverse-ai",
+  "version": "1.0.0",
+  "description": "BOOKVERSE AI — The Futuristic AI-Powered 3D Digital Library, Deep Research Engine & Reading Ecosystem",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "keywords": [
+    "bookverse",
+    "ai-library",
+    "threejs",
+    "gemini",
+    "openai",
+    "deep-research",
+    "audiobook",
+    "digital-library"
+  ],
+  "author": "BookVerse AI Engineering Team",
+  "license": "MIT"
+}
